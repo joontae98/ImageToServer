@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -65,12 +66,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mName = etxMname.getText().toString();
-                imgUpload();
+                if (!mName.isEmpty()){
+                    imgUpload();
+                }
             }
         });
         btnDown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                viewImg.setImageBitmap(null);
                 uName = etxUname.getText().toString();
                 imgDownload();
             }
@@ -143,6 +147,10 @@ public class MainActivity extends AppCompatActivity {
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String s) {
+                                if(!s.isEmpty()){
+                                    Log.e("err","이미있는 이름 입니다.");
+                                    showMessage("이미있는 이름 입니다.");
+                                }
                             }
                         },
                         new Response.ErrorListener() {
@@ -175,14 +183,18 @@ public class MainActivity extends AppCompatActivity {
                 StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.e("res",response);
-                        try {
-                            JSONObject jsonObject = new JSONObject(response);
-                            Log.e("download image", jsonObject.getString("image"));
-                            image = jsonObject.getString("image");
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                        if (!response.isEmpty()) {
+                            try {
+                                JSONObject jsonObject = new JSONObject(response);
+                                Log.e("download image", jsonObject.getString("image"));
+                                image = jsonObject.getString("image");
+                                return;
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
+                        Log.e("err","없는 이름입니다.");
+                        showMessage("없는 이름입니다.");
                     }
                 }, new Response.ErrorListener() {
                     @Override
@@ -208,4 +220,10 @@ public class MainActivity extends AppCompatActivity {
         return BitmapFactory.decodeByteArray(byteArr, 0, byteArr.length);
     }
 
+    private void showMessage(String str) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("오류").setMessage(str);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
 }
