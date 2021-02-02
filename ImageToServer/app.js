@@ -16,4 +16,5 @@ var router = require('./routes/user')(app,User);
 app.set('port',3000);
 var server = http.createServer(app).listen(app.get('port'), () => {
     console.log("Express server has started on port " + app.get('port'));
+
 });

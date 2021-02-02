@@ -5,8 +5,8 @@ module.exports = (app, User) => {
         user.save((err) => {
             if (err) {
                 console.log(err);
+                res.send("err");
             }
-            res.json(user);
         });
     })
     app.post('/process/down', (req, res) => {
